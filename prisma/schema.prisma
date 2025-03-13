@@ -79,3 +79,8 @@ enum Role {
   ADMIN
   PLAYER
 }
+
+model Images {
+  id        String    @id @default(uuid())
+  url       String    @unique
+}
