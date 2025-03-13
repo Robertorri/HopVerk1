@@ -62,11 +62,12 @@ imageApi.post("/cloudinary", requireAuth, requireAdmin, async (c) => {
 });
 
 imageApi.get("/all", async (c) => {
-  try {
-    const allImages = await prisma.image.findMany();
-    return c.json(allImages.map((image) => image.url));
-  } catch (error: any) {
-    await logger.error("Error fetching images", undefined, error.message);
-    return c.json({ error: "Failed to fetch images" }, 500);
-  }
-});
+    try {
+      const allImages = await prisma.image.findMany();
+      return c.json(allImages.map((image: { url: string }) => image.url));
+    } catch (error: any) {
+      await logger.error("Error fetching images", undefined, error.message);
+      return c.json({ error: "Failed to fetch images" }, 500);
+    }
+  });
+  
