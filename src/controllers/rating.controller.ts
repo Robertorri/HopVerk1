@@ -13,26 +13,27 @@ export class RatingController {
       }
       const userId = c.user.id;
 
-      const existingItem = await prisma.item.findUnique({
-        where: { id: data.itemId },
+      // Check if image exists instead of item
+      const existingImage = await prisma.image.findUnique({
+        where: { id: data.imageId },
       });
-      if (!existingItem) {
-        return c.json({ error: 'Item not found' }, 404);
+      if (!existingImage) {
+        return c.json({ error: 'Image not found' }, 404);
       }
 
       // Upsert rating
       const rating = await prisma.rating.upsert({
         where: {
-          userId_itemId: {
+          userId_imageId: {
             userId,
-            itemId: data.itemId,
+            imageId: data.imageId,
           },
         },
-        update: { ratingType: data.ratingType },
+        update: { score: data.score },
         create: {
           userId,
-          itemId: data.itemId,
-          ratingType: data.ratingType,
+          imageId: data.imageId,
+          score: data.score,
         },
       });
 

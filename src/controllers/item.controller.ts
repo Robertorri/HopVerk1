@@ -1,17 +1,18 @@
 import prisma from '../utils/prisma.js';
-import { createItemSchema } from '../schema.zod.js';
+import { createImageSchema } from '../schema.zod.js';
 import type { Context } from 'hono';
 
 export class ItemController {
   static async createItem(c: Context) {
     try {
       const body = await c.req.json();
-      const data = createItemSchema.parse(body);
+      const data = createImageSchema.parse(body);
 
-      const newItem = await prisma.item.create({
+      const newItem = await prisma.image.create({
         data: {
-          name: data.name,
-          imageUrl: data.imageUrl || '',
+          url: data.imageUrl || '',
+          prompt: data.prompt,
+          uploadedById: c.user!.id,
         },
       });
 
@@ -29,12 +30,12 @@ export class ItemController {
       const skip = (page - 1) * limit;
 
       const [items, totalCount] = await Promise.all([
-        prisma.item.findMany({
+        prisma.image.findMany({
           skip,
           take: limit,
           include: { ratings: true },
         }),
-        prisma.item.count(),
+        prisma.image.count(),
       ]);
 
       return c.json({
@@ -50,8 +51,8 @@ export class ItemController {
 
   static async getItemById(c: Context) {
     try {
-      const id = Number(c.req.param('id'));
-      const item = await prisma.item.findUnique({
+      const id = c.req.param('id');
+      const item = await prisma.image.findUnique({
         where: { id },
         include: { ratings: true },
       });
@@ -66,8 +67,8 @@ export class ItemController {
 
   static async deleteItem(c: Context) {
     try {
-      const id = Number(c.req.param('id'));
-      await prisma.item.delete({ where: { id } });
+      const id = c.req.param('id');
+      await prisma.image.delete({ where: { id } });
       return c.json({ message: 'Item deleted' });
     } catch (error: any) {
       return c.json({ error: 'Item not found' }, 404);

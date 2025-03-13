@@ -84,6 +84,7 @@ app.post("/admin/upload", requireAuth, requireAdmin, async (c) => {
   try {
     const uploadResult = await cloudinary.uploader.upload(dataURI);
     
+    // Fix: Use correct casing for the model name (Image not image)
     const image = await prisma.image.create({ 
       data: { 
         url: uploadResult.secure_url,
@@ -93,7 +94,7 @@ app.post("/admin/upload", requireAuth, requireAdmin, async (c) => {
     });
 
     // Log upload action
-    await prisma.log.create({
+    await prisma.Log.create({
       data: {
         userId: c.user!.id,
         action: "UPLOAD_IMAGE",
@@ -164,7 +165,7 @@ app.post("/images/rate/:id", requireAuth, async (c) => {
     });
 
     // Log rating action
-    await prisma.log.create({
+    await prisma.Log.create({
       data: {
         userId: c.user!.id,
         action: "RATE_IMAGE",
