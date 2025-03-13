@@ -2,7 +2,7 @@ import type { Context, Next } from 'hono';
 import { verifyToken } from '../utils/jwt.js';
 
 export interface UserData {
-  id: number;
+  id: string; // Update type to string to match your schema
   role: string;
 }
 
@@ -20,10 +20,10 @@ export const requireAuth = async (c: Context, next: Next) => {
     }
     const token = authHeader.split(' ')[1]; // "Bearer <token>"
 
-    const payload = verifyToken(token) as { userId: number; role: string };
+    const payload = verifyToken(token) as { userId: string; role: string };
 
     c.user = {
-      id: payload.userId,
+      id: payload.userId, // Now expecting a string
       role: payload.role,
     };
 

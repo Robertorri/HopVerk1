@@ -1,9 +1,4 @@
-/**
- * Result type. Wraps a call result with either an Ok value or an Error.
- * If the call was successful, `ok` is true and `value` contains the result.
- * If the call failed, `ok` is false and `error` contains the error.
- * Default error type is `Error`.
- */
+
 export type Result<Ok, Err = Error> =
   | { ok: true; value: Ok }
   | { ok: false; error: Err };
@@ -15,7 +10,6 @@ export type Paginated<T> = {
   offset: number;
 };
 
-// TODO should we expose IDs?
 
 export type Category = {
   id: number;
@@ -81,10 +75,8 @@ export type LimitOffset = {
   offset: number;
 };
 
-/** Explicit type for a slug, see how we use it with type guards in slug.ts */
 export type Slug = string & { __brand: 'slug' };
 
-/** Id is a positive integer. */
 export type Id = number & { __brand: 'id' };
 
 export interface ICategory {

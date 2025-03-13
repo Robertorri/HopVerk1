@@ -12,7 +12,7 @@ export const loginSchema = z.object({
 
 export const createImageSchema = z.object({
   prompt: z.string().min(1, 'Prompt is required'),
-  file: z.any(), // This will be validated separately
+  file: z.any(), 
 });
 
 export const ratingSchema = z.object({

@@ -24,7 +24,6 @@ export class ItemController {
 
   static async getItems(c: Context) {
     try {
-      // example pagination
       const page = parseInt(c.req.query('page') || '1');
       const limit = parseInt(c.req.query('limit') || '10');
       const skip = (page - 1) * limit;

@@ -7,11 +7,9 @@ import { signToken } from "./utils/jwt.js";
 
 const app = new Hono();
 
-// Register Route
 app.post("/auth/register", async (c) => {
   const { username, password } = await c.req.json();
   
-  // Check if user already exists
   const existingUser = await prisma.user.findUnique({ where: { username } });
   if (existingUser) {
     return c.json({ error: "Username already taken" }, 400);
@@ -33,7 +31,6 @@ app.post("/auth/register", async (c) => {
   });
 });
 
-// Login Route
 app.post("/auth/login", async (c) => {
   const { username, password } = await c.req.json();
   const user = await prisma.user.findUnique({ where: { username } });
@@ -44,16 +41,14 @@ app.post("/auth/login", async (c) => {
 
   const token = signToken({ userId: user.id, role: user.role });
   
-  // Create session
   await prisma.session.create({
     data: {
       userId: user.id,
       token,
-      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours from now
+      expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), 
     }
   });
   
-  // Log login action
   await prisma.log.create({
     data: {
       userId: user.id,
@@ -65,7 +60,6 @@ app.post("/auth/login", async (c) => {
   return c.json({ token, userId: user.id, role: user.role });
 });
 
-// Upload Image (Admin Only)
 app.post("/admin/upload", requireAuth, requireAdmin, async (c) => {
   const body = await c.req.formData();
   const file = body.get("file") as File;
@@ -77,14 +71,12 @@ app.post("/admin/upload", requireAuth, requireAdmin, async (c) => {
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
   
-  // Convert buffer to base64
   const base64Image = buffer.toString('base64');
   const dataURI = `data:${file.type};base64,${base64Image}`;
 
   try {
     const uploadResult = await cloudinary.uploader.upload(dataURI);
     
-    // Fix: Use correct casing for the model name (Image not image)
     const image = await prisma.image.create({ 
       data: { 
         url: uploadResult.secure_url,
@@ -93,7 +85,6 @@ app.post("/admin/upload", requireAuth, requireAdmin, async (c) => {
       } 
     });
 
-    // Log upload action
     await prisma.log.create({
       data: {
         userId: String(c.user!.id),
@@ -108,20 +99,18 @@ app.post("/admin/upload", requireAuth, requireAdmin, async (c) => {
   }
 });
 
-// Get Random Image
 app.get("/images/random", requireAuth, async (c) => {
-  // Get a random image that the user hasn't rated yet
   const images = await prisma.image.findMany({
     where: {
       ratings: {
         none: {
-          userId: String(c.user!.id) // Convert number to string
+          userId: String(c.user!.id) 
         }
       }
     },
     take: 1,
     orderBy: {
-      createdAt: "desc" // Get the most recent unrated image
+      createdAt: "desc" 
     }
   });
   
@@ -132,7 +121,6 @@ app.get("/images/random", requireAuth, async (c) => {
   return c.json(images[0]);
 });
 
-// Rate Image
 app.post("/images/rate/:id", requireAuth, async (c) => {
   const { id } = c.req.param();
   const { score } = await c.req.json();
@@ -141,14 +129,12 @@ app.post("/images/rate/:id", requireAuth, async (c) => {
     return c.json({ error: "Invalid rating value, must be 1 or -1" }, 400);
   }
 
-  // Check if image exists
   const image = await prisma.image.findUnique({ where: { id } });
   if (!image) {
     return c.json({ error: "Image not found" }, 404);
   }
 
   try {
-    // Upsert rating (create or update)
     const rating = await prisma.rating.upsert({
       where: {
         userId_imageId: {
@@ -164,7 +150,6 @@ app.post("/images/rate/:id", requireAuth, async (c) => {
       }
     });
 
-    // Log rating action
     await prisma.log.create({
       data: {
         userId: String(c.user!.id),
@@ -179,7 +164,6 @@ app.post("/images/rate/:id", requireAuth, async (c) => {
   }
 });
 
-// Get Median Score
 app.get("/images/median", requireAuth, async (c) => {
   const ratings = await prisma.rating.findMany();
   if (ratings.length === 0) {

@@ -29,7 +29,6 @@ imageApi.post("/cloudinary", async (c) => {
   if (uploadResult) {
     await prisma.images.create({
       data: {
-        // name: name ?? uploadResult.public_id,
         url: uploadResult.url,
       },
     });
