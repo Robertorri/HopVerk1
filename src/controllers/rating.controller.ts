@@ -1,6 +1,7 @@
 import prisma from '../utils/prisma.js';
 import { ratingSchema } from '../schema.zod.js';
 import type { Context } from 'hono';
+import { sanitizeInput, isValidUUID } from '../utils/security.js';
 
 export class RatingController {
   static async rateItem(c: Context) {
@@ -12,6 +13,10 @@ export class RatingController {
         return c.json({ error: 'Unauthorized' }, 401);
       }
       const userId = c.user.id.toString();
+
+      if (!isValidUUID(data.imageId)) {
+        return c.json({ error: 'Invalid image ID format' }, 400);
+      }
 
       const existingImage = await prisma.image.findUnique({
         where: { id: data.imageId },

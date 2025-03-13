@@ -18,12 +18,16 @@ export const requireAuth = async (c: Context, next: Next) => {
     if (!authHeader) {
       return c.json({ error: 'No authorization header provided' }, 401);
     }
-    const token = authHeader.split(' ')[1]; // "Bearer <token>"
+    const token = authHeader.split(' ')[1]; 
 
-    const payload = verifyToken(token) as { userId: string; role: string };
+    const payload = verifyToken(token);
+    
+    if (!payload) {
+      return c.json({ error: 'Invalid token' }, 401);
+    }
 
     c.user = {
-      id: payload.userId, // Now expecting a string
+      id: payload.userId,
       role: payload.role,
     };
 

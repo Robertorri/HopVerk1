@@ -4,22 +4,51 @@ import { cloudinary } from "./cloudinary.js";
 import { requireAuth, requireAdmin } from "./middleware/auth.middleware.js";
 import prisma from "./utils/prisma.js";
 import { signToken } from "./utils/jwt.js";
+import { sanitizeInput, isRateLimited } from "./utils/security.js";
 
 const app = new Hono();
+
+// Add security headers middleware
+app.use('*', async (c, next) => {
+  // Apply rate limiting
+  const ip = c.req.header('x-forwarded-for') || 'unknown';
+  if (isRateLimited(ip)) {
+    return c.json({ error: 'Too many requests' }, 429);
+  }
+
+  await next();
+
+  // Add security headers
+  c.header('Content-Security-Policy', "default-src 'self'");
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('X-Frame-Options', 'DENY');
+  c.header('X-XSS-Protection', '1; mode=block');
+  c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+  c.header('Permissions-Policy', 'geolocation=(), camera=()');
+});
 
 app.post("/auth/register", async (c) => {
   const { username, password } = await c.req.json();
   
-  const existingUser = await prisma.user.findUnique({ where: { username } });
+  // Sanitize inputs
+  const cleanUsername = sanitizeInput(username);
+  
+  const existingUser = await prisma.user.findUnique({ where: { username: cleanUsername } });
   if (existingUser) {
     return c.json({ error: "Username already taken" }, 400);
   }
   
-  const hashedPassword = await bcrypt.hash(password, 10);
+  // Enforce stronger password policy
+  if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)) {
+    return c.json({ error: "Password must be at least 8 characters and include uppercase, lowercase, number, and special character" }, 400);
+  }
+  
+  // Use higher cost factor for bcrypt (12+)
+  const hashedPassword = await bcrypt.hash(password, 12);
   
   const user = await prisma.user.create({ 
     data: { 
-      username, 
+      username: cleanUsername, 
       password: hashedPassword, 
       role: "PLAYER" 
     } 
