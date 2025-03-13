@@ -2,8 +2,8 @@ import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client";
 import { sign, verify } from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { cloudinary } from "./cloudinary";
-import { authMiddleware } from "./middleware/authMiddleware";  
+import { cloudinary } from "./cloudinary.js";
+//import { authMiddleware } from "./middleware/authMiddleware";  
 import { z } from "zod";
 
 const app = new Hono();
