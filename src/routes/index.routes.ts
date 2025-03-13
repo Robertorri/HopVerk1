@@ -1,33 +1,33 @@
 import { Hono } from 'hono';
-import { categoriesApi } from './categories.routes.js';
-import { questionsApi } from './questions.routes.js';
+import authRouter from './auth.routes.js';
+import itemRouter from './item.routes.js';
+import ratingRouter from './rating.routes.js';
 
-export const api = new Hono();
+const mainRouter = new Hono();
 
-const routes = [
-  {
-    href: '/',
-    methods: ['GET'],
-  },
-  {
-    href: '/categories',
-    querystrings: ['limit', 'offset'],
-    methods: ['GET', 'POST'],
-  },
-  {
-    href: '/categories/:slug',
-    methods: ['GET', 'PATCH', 'DELETE'],
-  },
-  {
-    href: '/questions',
-    methods: ['GET', 'POST'],
-  },
-  {
-    href: '/questions/:id',
-    methods: ['GET', 'PATCH', 'DELETE'],
-  },
-];
+mainRouter.get('/', (c) => {
+  return c.json({
+    message: 'Welcome to the Rating Game API (Hono)',
+    routes: {
+      auth: {
+        register: 'POST /auth/register',
+        login: 'POST /auth/login',
+      },
+      items: {
+        getAll: 'GET /items',
+        getById: 'GET /items/:id',
+        create: 'POST /items (admin)',
+        delete: 'DELETE /items/:id (admin)',
+      },
+      ratings: {
+        upsert: 'POST /ratings',
+      },
+    },
+  });
+});
 
-api.get('/', (c) => c.json(routes));
-api.route('/categories', categoriesApi);
-api.route('/questions', questionsApi);
+mainRouter.route('/auth', authRouter);
+mainRouter.route('/items', itemRouter);
+mainRouter.route('/ratings', ratingRouter);
+
+export default mainRouter;
