@@ -18,8 +18,7 @@ model User {
   images    Image[]
   comments  Comment[]
   sessions  Session[]
-  createdAt DateTime  @default(now())
-  Log       Log[]
+  createdAt DateTime @default(now())
 }
 
 model Image {
