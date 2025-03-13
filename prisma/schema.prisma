@@ -75,7 +75,6 @@ model Log {
 }
 
 enum Role {
-  USER
   ADMIN
   PLAYER
 }

@@ -89,14 +89,14 @@ app.post("/admin/upload", requireAuth, requireAdmin, async (c) => {
       data: { 
         url: uploadResult.secure_url,
         prompt,
-        uploadedById: c.user!.id
+        uploadedById: String(c.user!.id)
       } 
     });
 
     // Log upload action
-    await prisma.Log.create({
+    await prisma.log.create({
       data: {
-        userId: c.user!.id,
+        userId: String(c.user!.id),
         action: "UPLOAD_IMAGE",
         details: `Image uploaded: ${image.id}`
       }
@@ -115,7 +115,7 @@ app.get("/images/random", requireAuth, async (c) => {
     where: {
       ratings: {
         none: {
-          userId: c.user!.id
+          userId: String(c.user!.id) // Convert number to string
         }
       }
     },
@@ -152,22 +152,22 @@ app.post("/images/rate/:id", requireAuth, async (c) => {
     const rating = await prisma.rating.upsert({
       where: {
         userId_imageId: {
-          userId: c.user!.id,
+          userId: String(c.user!.id),
           imageId: id
         }
       },
       update: { score },
       create: {
-        userId: c.user!.id,
+        userId: String(c.user!.id),
         imageId: id,
         score,
       }
     });
 
     // Log rating action
-    await prisma.Log.create({
+    await prisma.log.create({
       data: {
-        userId: c.user!.id,
+        userId: String(c.user!.id),
         action: "RATE_IMAGE",
         details: `Rated image ${id} with score ${score}`
       }

@@ -10,9 +10,9 @@ export class ItemController {
 
       const newItem = await prisma.image.create({
         data: {
-          url: data.imageUrl || '',
+          url: data.file || '',
           prompt: data.prompt,
-          uploadedById: c.user!.id,
+          uploadedById: String(c.user!.id),
         },
       });
 

@@ -11,9 +11,8 @@ export class RatingController {
       if (!c.user) {
         return c.json({ error: 'Unauthorized' }, 401);
       }
-      const userId = c.user.id;
+      const userId = c.user.id.toString();
 
-      // Check if image exists instead of item
       const existingImage = await prisma.image.findUnique({
         where: { id: data.imageId },
       });
@@ -21,7 +20,6 @@ export class RatingController {
         return c.json({ error: 'Image not found' }, 404);
       }
 
-      // Upsert rating
       const rating = await prisma.rating.upsert({
         where: {
           userId_imageId: {
