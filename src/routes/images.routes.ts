@@ -2,10 +2,12 @@ import { Hono } from "hono";
 import { v2 as cloudinary } from "cloudinary";
 import { env } from "node:process";
 import { encodeBase64 } from "hono/utils/encode";
-import { PrismaClient } from "@prisma/client";
+import prisma from "../utils/prisma.js";
+import { sanitizeInput } from "../utils/security.js";
+import { requireAuth, requireAdmin } from "../middleware/auth.middleware.js";
+import logger from "../utils/logger.js";
 
 export const imageApi = new Hono();
-const prisma = new PrismaClient();
 
 const cloudinaryConfig = {
   cloud_name: env.CLOUDINARY_CLOUD_NAME,
@@ -15,31 +17,56 @@ const cloudinaryConfig = {
 
 cloudinary.config(cloudinaryConfig);
 
-imageApi.post("/cloudinary", async (c) => {
-  const { file, name }: { file: File; name?: string } = await c.req.parseBody();
-  const byteArrayBuffer = await file.arrayBuffer();
-  const base64 = encodeBase64(byteArrayBuffer);
+const VALID_MIME_TYPES = ['image/jpeg', 'image/png'];
+const MAX_FILE_SIZE = 5 * 1024 * 1024; 
 
-  const uploadResult = await cloudinary.uploader.upload(
-    `data:image/png;base64,${base64}`,
-    { public_id: name },
-  );
-  console.log(uploadResult);
+imageApi.post("/cloudinary", requireAuth, requireAdmin, async (c) => {
+  try {
+    const { file, name }: { file: File; name?: string } = await c.req.parseBody();
+    
+    if (!VALID_MIME_TYPES.includes(file.type)) {
+      return c.json({ error: "Invalid file type. Einungis JPEG, PNG" }, 400);
+    }
+    
+    if (file.size > MAX_FILE_SIZE) {
+      return c.json({ error: "File too large. Maximum size is 5MB" }, 400);
+    }
+    
+    const sanitizedName = name ? sanitizeInput(name) : undefined;
+    
+    const byteArrayBuffer = await file.arrayBuffer();
+    const base64 = encodeBase64(byteArrayBuffer);
 
-  if (uploadResult) {
-    await prisma.images.create({
-      data: {
-        url: uploadResult.url,
-      },
-    });
+    const uploadResult = await cloudinary.uploader.upload(
+      `data:image/png;base64,${base64}`,
+      { public_id: sanitizedName },
+    );
+
+    if (uploadResult) {
+      await prisma.image.create({
+        data: {
+          url: uploadResult.url,
+          prompt: sanitizedName || "Uploaded image",
+          uploadedById: c.user!.id
+        },
+      });
+      
+      await logger.info("Image uploaded", c.user!.id, `Cloudinary image ID: ${uploadResult.public_id}`);
+    }
+
+    return c.json(uploadResult);
+  } catch (error: any) {
+    await logger.error("Image upload error", c.user?.id, error.message);
+    return c.json({ error: error.message || "Upload failed" }, 500);
   }
-
-  return c.json(uploadResult);
 });
 
 imageApi.get("/all", async (c) => {
-    const allImages = await prisma.image.findMany(); // Fix: use `image` instead of `images`
-  
-    return c.json(allImages.map((image: { url: string }) => image.url));
-  });
-  
+  try {
+    const allImages = await prisma.image.findMany();
+    return c.json(allImages.map((image) => image.url));
+  } catch (error: any) {
+    await logger.error("Error fetching images", undefined, error.message);
+    return c.json({ error: "Failed to fetch images" }, 500);
+  }
+});

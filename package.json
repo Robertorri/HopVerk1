@@ -7,7 +7,11 @@
     "start": "node ./dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "audit": "npm audit --production",
+    "audit:fix": "npm audit fix",
+    "update:check": "npx npm-check-updates",
+    "update:deps": "npx npm-check-updates -u && npm install"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -18,7 +22,7 @@
     "@prisma/client": "^6.5.0",
     "@types/bcryptjs": "^2.4.6",
     "bcrypt": "^5.1.1",
-    "bcryptjs": "^3.0.2",
+    "bcryptjs": "^2.4.3",
     "cloudinary": "^2.6.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
