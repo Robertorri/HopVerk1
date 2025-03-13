@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { sign, verify } from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { cloudinary } from "./cloudinary";
-import { authMiddleware } from "./middleware/authMiddleware";  // ✅ Keep this
+import { authMiddleware } from "./middleware/authMiddleware";  
 import { z } from "zod";
 
 const app = new Hono();
