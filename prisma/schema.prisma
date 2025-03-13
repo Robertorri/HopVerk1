@@ -13,6 +13,8 @@ model User {
   comments  Comment[]
   sessions  Session[]
   createdAt DateTime @default(now())
+
+  logs      Log[]    // This is the "back relation"
 }
 
 model Image {
