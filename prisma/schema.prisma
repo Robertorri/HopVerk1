@@ -7,7 +7,7 @@ model User {
   id        String    @id @default(uuid())
   username  String    @unique
   password  String
-  role      Role
+  role      Role     @default(PLAYER)
   ratings   Rating[]
   images    Image[]
   comments  Comment[]
@@ -35,6 +35,7 @@ model Rating {
   imageId   String
   score     Int // 1 for positive, -1 for negative
   createdAt DateTime @default(now())
+  @@unique([userId, imageId]) // 1 rating per user per image.
 }
 
 model Comment {
