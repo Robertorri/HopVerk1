@@ -18,6 +18,7 @@ model User {
   images    Image[]
   comments  Comment[]
   sessions  Session[]
+  logs      Log[]     // Add this field to connect to the Log model
   createdAt DateTime @default(now())
 }
 
