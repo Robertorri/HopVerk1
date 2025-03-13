@@ -13,13 +13,14 @@ model User {
   id        String    @id @default(uuid())
   username  String    @unique
   password  String
-  role      Role     @default(PLAYER)
+  role      Role      @default(PLAYER)
   ratings   Rating[]
   images    Image[]
   comments  Comment[]
   sessions  Session[]
-  logs      Log[]     // Add this field to connect to the Log model
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
+
+  logs Log[]
 }
 
 model Image {
@@ -41,6 +42,7 @@ model Rating {
   imageId   String
   score     Int // 1 for positive, -1 for negative
   createdAt DateTime @default(now())
+
   @@unique([userId, imageId]) // 1 rating per user per image.
 }
 
@@ -65,10 +67,10 @@ model Session {
 
 model Log {
   id        String   @id @default(uuid())
-  user      User?    @relation(fields: [userId], references: [id]) // Nullable (system logs)
   userId    String?
-  action    String // e.g., "LOGIN", "UPLOAD_IMAGE", "RATE_IMAGE"
-  details   String? // Extra info (optional)
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String
+  details   String?
   createdAt DateTime @default(now())
 }
 
