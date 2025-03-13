@@ -13,7 +13,6 @@ export class RatingController {
       }
       const userId = c.user.id;
 
-      // Check if item exists
       const existingItem = await prisma.item.findUnique({
         where: { id: data.itemId },
       });
