@@ -185,7 +185,10 @@ app.get("/images/median", requireAuth, async (c) => {
     return c.json({ median: 0 });
   }
   
-  const scores = ratings.map((r) => r.score).sort((a, b) => a - b);
+  const scores = ratings
+  .map((r: { score: number }) => r.score)
+  .sort((a: number, b: number) => a - b);
+  
   const median =
     scores.length % 2 === 0
       ? (scores[scores.length / 2 - 1] + scores[scores.length / 2]) / 2

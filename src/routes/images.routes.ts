@@ -39,7 +39,8 @@ imageApi.post("/cloudinary", async (c) => {
 });
 
 imageApi.get("/all", async (c) => {
-  const allImages = await prisma.images.findMany();
-
-  return c.json(allImages.map((image) => image.url));
-});
+    const allImages = await prisma.image.findMany(); // Fix: use `image` instead of `images`
+  
+    return c.json(allImages.map((image: { url: string }) => image.url));
+  });
+  
