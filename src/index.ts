@@ -151,7 +151,7 @@ app.get("/images/random", requireAuth, async (c) => {
 });
 
 app.post("/images/rate/:id", requireAuth, async (c) => {
-  const { id } = c.req.param();
+  const id = c.req.param("id");
   const { score } = await c.req.json();
 
   if (![1, -1].includes(score)) {
