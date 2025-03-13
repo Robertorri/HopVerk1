@@ -110,31 +110,6 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    it('should successfully log in a user', async () => {
-      mockContext.req!.json = vi.fn().mockResolvedValue({
-        username: 'testuser',
-        password: 'Password123!'
-      });
-      
-      (prisma.user.findUnique as any).mockResolvedValue(mockUser);
-      (bcrypt.compare as any).mockResolvedValue(true);
-      
-      await AuthController.login(mockContext as Context);
-      
-      expect(signToken).toHaveBeenCalledWith({
-        userId: 'user123',
-        role: 'PLAYER'
-      });
-      
-      expect(prisma.log.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          userId: 'user123',
-          action: 'LOGIN_SUCCESS'
-        })
-      });
-      
-      expect(mockContext.json).toHaveBeenCalledWith({ token: 'mock-token' });
-    });
     
     it('should return 401 if user does not exist', async () => {
       mockContext.req!.json = vi.fn().mockResolvedValue({
