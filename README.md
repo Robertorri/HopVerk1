@@ -21,11 +21,11 @@ npm install
 Útbúið `.env` skrá með eftirfarandi gögnum, erum búnir að pusha .env file á git svo breytir ekki 
 
 ```env
-DATABASE_URL="postgres://user:pass@host:5432/database"
-JWT_SECRET="öruggt-jwt-lykilorð"
-CLOUDINARY_CLOUD_NAME="cloudinary-nafn"
-CLOUDINARY_API_KEY="cloudinary-api-lykil"
-CLOUDINARY_API_SECRET="cloudinary-leyndarlykilorð"
+DATABASE_URL="postgresql://vef2_2025_v2_erzv_user:VjurC0u90Bfz9dngZ4LZw6bxRxzzjrNz@dpg-cuqtnea3esus739srdvg-a.frankfurt-postgres.render.com/vef2_2025_v2_erzv"
+CLOUDINARY_CLOUD_NAME=ddekbps8m
+CLOUDINARY_API_KEY=638656471273766
+CLOUDINARY_API_SECRET=NdrVSDcGGXa82hmV_uUBn9-vdfs
+JWT_SECRET=f12fba93a757b212aed38a6b4ec8cb5154e3b265c999127b06a850c8d363d58e
 ```
 
 ### 3. Prisma uppsetning og gagnagrunnur
