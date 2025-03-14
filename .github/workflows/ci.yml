@@ -25,16 +25,30 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Prisma Migrate
-        env:
-          DATABASE_URL: '${{ secrets.DATABASE_URL }}'
-        run: npx prisma migrate deploy
-
-      - name: Run Jest tests
+      - name: Set up environment variables
         env:
           DATABASE_URL: '${{ secrets.DATABASE_URL }}'
           JWT_SECRET: '${{ secrets.JWT_SECRET }}'
           CLOUDINARY_CLOUD_NAME: '${{ secrets.CLOUDINARY_CLOUD_NAME }}'
           CLOUDINARY_API_KEY: '${{ secrets.CLOUDINARY_API_KEY }}'
           CLOUDINARY_API_SECRET: '${{ secrets.CLOUDINARY_API_SECRET }}'
-        run: npm test
+        run: |
+          echo "DATABASE_URL=$DATABASE_URL" >> .env
+          echo "JWT_SECRET=$JWT_SECRET" >> .env
+          echo "CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME" >> .env
+          echo "CLOUDINARY_API_KEY=$CLOUDINARY_API_KEY" >> .env
+          echo "CLOUDINARY_API_SECRET=$CLOUDINARY_API_SECRET" >> .env
+          echo "NODE_ENV=test" >> .env
+
+      - name: Debug environment variables
+        run: |
+          echo "DATABASE_URL is set: $([[ -n \"$DATABASE_URL\" ]] && echo 'yes' || echo 'no')"
+          echo "JWT_SECRET is set: $([[ -n \"$JWT_SECRET\" ]] && echo 'yes' || echo 'no')"
+          echo "CLOUDINARY_CLOUD_NAME is set: $([[ -n \"$CLOUDINARY_CLOUD_NAME\" ]] && echo 'yes' || echo 'no')"
+          echo "CLOUDINARY_API_KEY is set: $([[ -n \"$CLOUDINARY_API_KEY\" ]] && echo 'yes' || echo 'no')"
+          echo "CLOUDINARY_API_SECRET is set: $([[ -n \"$CLOUDINARY_API_SECRET\" ]] && echo 'yes' || echo 'no')"
+
+      - name: Run Prisma Migrate and Tests
+        run: |
+          npx prisma migrate deploy
+          npm test
