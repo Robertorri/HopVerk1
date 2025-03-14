@@ -28,7 +28,11 @@ describe('AuthController', () => {
       const response = await request(server)
         .post('/auth/register')
         .send({ username: 'testuser', password: 'Test123!' })
-        .expect(201);
+        .expect(201)
+        .catch(err => {
+          console.log('Error response:', err.response.body); // Log the error response
+          throw err;
+        });
 
       expect(response.body.message).toBe('Registration successful');
       expect(response.body.id).toBeDefined();
