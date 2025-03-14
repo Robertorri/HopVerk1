@@ -2,12 +2,18 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "strict": true,
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
-    "types": ["node"],
+    "esModuleInterop": true,
+    "types": ["node", "jest"],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "outDir": "./dist"
-  }
+    "outDir": "./dist",
+    "sourceMap": true,
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*.ts", "__tests__/**/*.ts", "jest.setup.ts"],
+  "exclude": ["node_modules", "dist"]
 }
