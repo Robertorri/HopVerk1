@@ -20,8 +20,8 @@ beforeAll(async () => {
     data: {
       username: 'admin',
       password: '$2a$12$hashedpasswordforsafety', // secure hashed password
-      role: 'ADMIN'
-    }
+      role: 'ADMIN',
+    },
   });
 
   // Create regular user explicitly
@@ -29,8 +29,17 @@ beforeAll(async () => {
     data: {
       username: 'regularuser',
       password: '$2a$12$hashedpasswordforsafety', // pre-hashed
-      role: 'PLAYER'
-    }
+      role: 'PLAYER',
+    },
+  });
+
+  // Create testuser explicitly
+  await prisma.user.create({
+    data: {
+      username: 'testuser',
+      password: '$2a$12$hashedpasswordforsafety', // pre-hashed
+      role: 'PLAYER',
+    },
   });
 
   server = serve({ fetch: app.fetch, port: 0 });
