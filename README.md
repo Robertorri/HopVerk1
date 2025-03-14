@@ -108,7 +108,9 @@ Authorization: Bearer <JWT-token>
 | Nafn                     | GitHub Notandanafn   |
 |--------------------------|----------------------|
 | Kristófer Birgir         | kristoferbirgir      |
-| *(Bættu við fleiri hér)* |                       |
+| Ari Gunnar               | forriddAri           |
+| Róbert Orri              | Robertorri           |
+| Benjamín Reynir          | Reynirjr             |
 
 ---
 
