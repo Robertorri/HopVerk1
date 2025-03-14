@@ -18,7 +18,7 @@ npm install
 
 ### 2. Umhverfisbreytur
 
-Útbúið `.env` skrá með eftirfarandi gögnum:
+Útbúið `.env` skrá með eftirfarandi gögnum, erum búnir að pusha .env file á git svo breytir ekki 
 
 ```env
 DATABASE_URL="postgres://user:pass@host:5432/database"
