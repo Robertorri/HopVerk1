@@ -11,8 +11,8 @@ Hópverkefni 1 í Vefforritun 2 (Háskóli Íslands, 2025)
 ### 1. Afrita repository
 
 ```bash
-git clone <REPO_URL>
-cd <repo_nafn>
+git clone https://github.com/Robertorri/HopVerk1.git
+cd HopVerk1
 npm install
 ```
 
