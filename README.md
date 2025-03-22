@@ -99,7 +99,7 @@ Authorization: Bearer <JWT-token>
 ## 🔐 Admin aðgangur
 
 - **Notandanafn:** `admin`  
-- **Lykilorð:** `admin123!` (Athugaðu að skipta þessu lykilorði út fyrir öruggara í production!)
+- **Lykilorð:** `admin123!` 
 
 ---
 
