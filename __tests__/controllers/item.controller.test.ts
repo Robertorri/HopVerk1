@@ -3,6 +3,7 @@ import { serve } from '@hono/node-server';
 import app from '../../src/app.js';
 import prisma from '../../src/utils/prisma.js';
 import { signToken } from '../../src/utils/jwt.js';
+import bcrypt from 'bcryptjs';
 
 let server: ReturnType<typeof serve>;
 
@@ -10,39 +11,75 @@ beforeAll(async () => {
   // Explicitly clear dependent tables first to avoid foreign key constraints
   await prisma.rating.deleteMany();
   await prisma.comment.deleteMany();
-  await prisma.image.deleteMany();
+  await prisma.image.deleteMany(); // Clear images before users
   await prisma.session.deleteMany();
   await prisma.log.deleteMany();
-  await prisma.user.deleteMany();
+  await prisma.user.deleteMany(); // Clear users last
+
+  console.log('Database cleared');
 
   // Create admin user explicitly
   const admin = await prisma.user.create({
     data: {
       username: 'admin',
-      password: '$2a$12$hashedpasswordforsafety', // secure hashed password
+      password: await bcrypt.hash('adminpassword', 12), // Hash the password
       role: 'ADMIN',
     },
   });
 
+  console.log('Admin user created:', admin);
+
   // Create regular user explicitly
-  await prisma.user.create({
+  const regularUser = await prisma.user.create({
     data: {
       username: 'regularuser',
-      password: '$2a$12$hashedpasswordforsafety', // pre-hashed
+      password: await bcrypt.hash('regularpassword', 12), // Hash the password
       role: 'PLAYER',
     },
   });
+
+  console.log('Regular user created:', regularUser);
 
   // Create testuser explicitly
-  await prisma.user.create({
+  const testUser = await prisma.user.create({
     data: {
       username: 'testuser',
-      password: '$2a$12$hashedpasswordforsafety', // pre-hashed
+      password: await bcrypt.hash('testpassword', 12), // Hash the password
       role: 'PLAYER',
     },
   });
 
+  console.log('Test user created:', testUser);
+
+  // Seed the database with test items
+  const items = await prisma.image.createMany({
+    data: [
+      {
+        url: 'https://example.com/image1.png',
+        prompt: 'Test item 1',
+        uploadedById: admin.id,
+      },
+      {
+        url: 'https://example.com/image2.png',
+        prompt: 'Test item 2',
+        uploadedById: regularUser.id,
+      },
+      {
+        url: 'https://example.com/image3.png',
+        prompt: 'Test item 3',
+        uploadedById: testUser.id,
+      },
+    ],
+  });
+
+  console.log('Seeded items:', items);
+
   server = serve({ fetch: app.fetch, port: 0 });
+});
+
+afterAll(async () => {
+  await prisma.$disconnect();
+  if (server) server.close();
 });
 
 describe('ItemController', () => {

@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { serve } from "@hono/node-server";
 import bcrypt from "bcrypt";
 import { cloudinary } from "./cloudinary.js";
 import { requireAuth, requireAdmin } from "./middleware/auth.middleware.js";
@@ -200,8 +201,8 @@ app.get("/images/median", requireAuth, async (c) => {
   }
   
   const scores = ratings
-  .map((r: { score: number }) => r.score)
-  .sort((a: number, b: number) => a - b);
+    .map((r: { score: number }) => r.score)
+    .sort((a: number, b: number) => a - b);
   
   const median =
     scores.length % 2 === 0
@@ -209,6 +210,15 @@ app.get("/images/median", requireAuth, async (c) => {
       : scores[Math.floor(scores.length / 2)];
 
   return c.json({ median });
+});
+
+// Set the port (if not already set) and ensure process.env.PORT is defined
+const port = Number(process.env.PORT || 3000);
+process.env.PORT = port.toString();
+
+// Start the server using the Node adapter. The callback receives AddressInfo.
+serve(app, (info) => {
+  console.log(`Server running on http://${info.address}:${info.port}`);
 });
 
 export default app;
