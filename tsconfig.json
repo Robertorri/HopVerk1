@@ -12,8 +12,10 @@
     "jsxImportSource": "hono/jsx",
     "outDir": "./dist",
     "sourceMap": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["node"]
   },
   "include": ["src/**/*.ts", "__tests__/**/*.ts", "jest.setup.ts"],
   "exclude": ["node_modules", "dist"]
 }
+
